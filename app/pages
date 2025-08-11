@@ -1,0 +1,42 @@
+'use client';
+import { useState } from 'react';
+
+export default function Home() {
+  const [title, setTitle] = useState('Pfannkuchen');
+  const [id, setId] = useState<string>('');
+
+  async function createRecipe() {
+    const r = await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        baseServings: 2,
+        instructionsMd: 'Mischen & braten',
+        ingredients: [
+          { name: 'Mehl', gramsBase: 120 },
+          { name: 'Milch', gramsBase: 300 },
+        ],
+      }),
+    });
+    const j = await r.json();
+    setId(j.id);
+  }
+
+  return (
+    <main className="p-6 max-w-xl mx-auto space-y-4">
+      <h1 className="text-2xl font-semibold">Recipe Agent (fresh)</h1>
+      <div className="flex gap-2">
+        <input className="border px-3 py-2 flex-1" value={title} onChange={(e)=>setTitle(e.target.value)} />
+        <button className="border px-3 py-2" onClick={createRecipe}>Rezept anlegen</button>
+      </div>
+      {id && (
+        <p className="text-sm">
+          <a className="underline text-blue-600" href={`/api/recipes/${id}`} target="_blank">
+            API: Rezept anzeigen
+          </a>
+        </p>
+      )}
+    </main>
+  );
+}
